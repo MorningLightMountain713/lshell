@@ -194,7 +194,9 @@ def exec_cmd(cmd):
         """Handle SIGTSTP (Ctrl+Z) by sending the process to the background."""
         if proc and proc.poll() is None:  # Ensure process is running
             proc.send_signal(signal.SIGSTOP)  # Stop the process
-            builtincmd.BACKGROUND_JOBS.append(proc)  # Add process to background jobs
+            builtincmd.BACKGROUND_JOBS.append(
+                proc
+            )  # Add process to background jobs
             job_id = len(builtincmd.BACKGROUND_JOBS)
             sys.stdout.write(f"\n[{job_id}]+  Stopped        {cmd}\n")
             sys.stdout.flush()
@@ -223,7 +225,7 @@ def exec_cmd(cmd):
                     stdin=devnull_in,  # Redirect input to /dev/null
                     stdout=sys.stdout,
                     stderr=sys.stderr,
-                    preexec_fn=os.setsid,
+                    process_group=0,
                 )
             # add to background jobs and return
             builtincmd.BACKGROUND_JOBS.append(proc)
@@ -231,7 +233,7 @@ def exec_cmd(cmd):
             print(f"[{job_id}] {cmd} (pid: {proc.pid})")
             retcode = 0
         else:
-            proc = subprocess.Popen(cmd_args, preexec_fn=os.setsid)
+            proc = subprocess.Popen(cmd_args, process_group=0)
             proc.communicate()
             retcode = proc.returncode if proc.returncode is not None else 0
 
